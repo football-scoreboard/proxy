@@ -1,8 +1,8 @@
-name: Update Leagues
+name: Update League Fixtures
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "*/5 * * * *"
 
   workflow_dispatch:
 
@@ -17,13 +17,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create leagues directory
-        run: mkdir -p data/leagues
+      - name: Create league-fixtures directory
+        run: mkdir -p data/league-fixtures
 
       - name: Install jq
         run: sudo apt-get install -y jq
 
-      - name: Fetch leagues
+      - name: Fetch league fixtures
         run: |
           LENGTH=$(jq '.leagues | length' data/leagues.json)
 
@@ -32,12 +32,12 @@ jobs:
             LEAGUE_ID=$(jq -r ".leagues[$i].id" data/leagues.json)
             SEASON=$(jq -r ".leagues[$i].season" data/leagues.json)
 
-            echo "Fetching league: $LEAGUE_ID season: $SEASON"
+            echo "Fetching fixtures for league: $LEAGUE_ID season: $SEASON"
 
             curl -s \
               -H "x-apisports-key: ${{ secrets.API_KEY_FOOTBALL }}" \
-              "https://v3.football.api-sports.io/leagues?season=${SEASON}" \
-              -o "data/leagues/${SEASON}.json"
+              "https://v3.football.api-sports.io/fixtures?league=${LEAGUE_ID}&season=${SEASON}&timezone=Asia/Tehran" \
+              -o "data/league-fixtures/${LEAGUE_ID}_${SEASON}.json"
 
           done
 
@@ -46,8 +46,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add data/leagues
+          git add data/league-fixtures
 
-          git commit -m "update leagues" || echo "No changes"
+          git commit -m "update league fixtures" || echo "No changes"
 
           git push
