@@ -35,7 +35,7 @@ jobs:
             curl -s \
               -H "x-apisports-key: ${{ secrets.API_KEY_FOOTBALL }}" \
               "https://v3.football.api-sports.io/fixtures?id=${MATCH_ID}&timezone=Asia/Tehran" \
-              -o "data/fixtures/${MATCH_ID}.json"
+              -o "data/fixtures/match_${MATCH_ID}_latest.json"
 
           done
 
